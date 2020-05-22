@@ -31,7 +31,7 @@ get_radio_image() {
 if [[ $1 == taimen || $1 == walleye || $1 == crosshatch || $1 == blueline || $1 == bonito || $1 == sargo ]]; then
     BOOTLOADER=$(get_radio_image bootloader google_devices/$1)
     RADIO=$(get_radio_image baseband google_devices/$1)
-    PREFIX=aosp_
+    PREFIX=lineage_
 elif [[ $1 != hikey && $1 != hikey960 ]]; then
     user_error "$1 is not supported by the release script"
 fi
