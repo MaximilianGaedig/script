@@ -8,5 +8,10 @@ echo "BUILD_DATETIME_FROM_FILE=$BUILD_DATETIME_FROM_FILE"
 export BUILD_NUMBER=$(cat out/build_number.txt 2>/dev/null || date -u -d @$BUILD_DATETIME_FROM_FILE +%Y.%m.%d.%H)
 echo "BUILD_NUMBER=$BUILD_NUMBER"
 export DISPLAY_BUILD_NUMBER=true
-export BUILD_USERNAME=grapheneos
-export BUILD_HOSTNAME=grapheneos
+export BUILD_USERNAME=glassrom
+export BUILD_HOSTNAME=glassrom
+export OVERRIDE_TARGET_FLATTEN_APEX=true
+export CCACHE_DISABLE=true
+export USE_CCACHE=0
+
+export TOP=$(pwd)
