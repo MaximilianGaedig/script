@@ -52,7 +52,14 @@ if [[ $DEVICE != hikey* ]]; then
         AVB_PKMD="$KEY_DIR/avb_pkmd.bin"
         EXTRA_OTA=(--retrofit_dynamic_partitions)
     else
-        VERITY_SWITCHES=(--avb_vbmeta_key "$KEY_DIR/avb.pem" --avb_vbmeta_algorithm SHA256_RSA2048)
+        VERITY_SWITCHES=(--avb_vbmeta_key "$KEY_DIR/avb8192.pem" --avb_vbmeta_algorithm SHA512_RSA8192
+		--avb_system_key "$KEY_DIR/avb8192.pem" --avb_system_algorithm SHA512_RSA8192
+		--avb_vendor_key "$KEY_DIR/avb8192.pem" --avb_vendor_algorithm SHA512_RSA8192
+		--avb_boot_key "$KEY_DIR/avb8192.pem" --avb_boot_algorithm SHA512_RSA8192
+		--avb_dtbo_key "$KEY_DIR/avb8192.pem" --avb_dtbo_algorithm SHA512_RSA8192
+		--avb_system_other_key "$KEY_DIR/avb8192.pem" --avb_system_other_algorithm SHA512_RSA8192
+		--avb_vbmeta_system_key "$KEY_DIR/avb8192.pem" --avb_vbmeta_system_algorithm SHA512_RSA8192
+		--avb_vbmeta_vendor_key "$KEY_DIR/avb8192.pem" --avb_vbmeta_vendor_algorithm SHA512_RSA8192)
         AVB_PKMD="$KEY_DIR/avb_pkmd.bin"
     fi
 fi
