@@ -10,7 +10,7 @@ chrt -b -p 0 $$
 [[ -n $BUILD_NUMBER ]] || user_error "expected BUILD_NUMBER in the environment"
 [[ -n $RETROFIT ]] || user_error "export RETROFIT=true or RETROFIT=false to specify retrofitting"
 
-if [[ $RETROFIT == ,"true" ]]; then
+if [[ $RETROFIT == "true" ]]; then
     printf "Using retrofitting\n"
     EXTRA_OTA=(--retrofit_dynamic_partitions)
 fi
