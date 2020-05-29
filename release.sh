@@ -8,6 +8,12 @@ chrt -b -p 0 $$
 
 [[ $# -eq 1 ]] || user_error "expected a single argument (device type)"
 [[ -n $BUILD_NUMBER ]] || user_error "expected BUILD_NUMBER in the environment"
+[[ -n $RETROFIT ]] || user_error "export RETROFIT=true or RETROFIT=false to specify retrofitting"
+
+if [[ $RETROFIT == "true" ]]; then
+    printf "Using retrofitting\n"
+    EXTRA_OTA=(--retrofit_dynamic_partitions)
+fi
 
 PERSISTENT_KEY_DIR=keys/$1
 OUT=out/release-$1-$BUILD_NUMBER
@@ -28,12 +34,11 @@ get_radio_image() {
     grep -Po "require version-$1=\K.+" vendor/$2/vendor-board-info.txt | tr '[:upper:]' '[:lower:]'
 }
 
+PREFIX=lineage_
+
 if [[ $1 == taimen || $1 == walleye || $1 == crosshatch || $1 == blueline || $1 == bonito || $1 == sargo || $1 == coral ]]; then
     BOOTLOADER=$(get_radio_image bootloader google_devices/$1)
     RADIO=$(get_radio_image baseband google_devices/$1)
-    PREFIX=aosp_
-elif [[ $1 != hikey && $1 != hikey960 ]]; then
-    user_error "$1 is not supported by the release script"
 fi
 
 BUILD=$BUILD_NUMBER
@@ -54,7 +59,14 @@ if [[ $DEVICE != hikey* ]]; then
             EXTRA_OTA=(--retrofit_dynamic_partitions)
         fi
     else
-        VERITY_SWITCHES=(--avb_vbmeta_key "$KEY_DIR/avb.pem" --avb_vbmeta_algorithm SHA256_RSA2048)
+        VERITY_SWITCHES=(--avb_vbmeta_key "$KEY_DIR/avb8192.pem" --avb_vbmeta_algorithm SHA512_RSA8192
+		--avb_system_key "$KEY_DIR/avb8192.pem" --avb_system_algorithm SHA512_RSA8192
+		--avb_vendor_key "$KEY_DIR/avb8192.pem" --avb_vendor_algorithm SHA512_RSA8192
+		--avb_boot_key "$KEY_DIR/avb8192.pem" --avb_boot_algorithm SHA512_RSA8192
+		--avb_dtbo_key "$KEY_DIR/avb8192.pem" --avb_dtbo_algorithm SHA512_RSA8192
+		--avb_system_other_key "$KEY_DIR/avb8192.pem" --avb_system_other_algorithm SHA512_RSA8192
+		--avb_vbmeta_system_key "$KEY_DIR/avb8192.pem" --avb_vbmeta_system_algorithm SHA512_RSA8192
+		--avb_vbmeta_vendor_key "$KEY_DIR/avb8192.pem" --avb_vbmeta_vendor_algorithm SHA512_RSA8192)
         AVB_PKMD="$KEY_DIR/avb_pkmd.bin"
     fi
 fi
@@ -64,7 +76,7 @@ build/tools/releasetools/sign_target_files_apks -o -d "$KEY_DIR" "${VERITY_SWITC
     $OUT/$TARGET_FILES || exit 1
 
 if [[ $DEVICE != hikey* ]]; then
-    build/tools/releasetools/ota_from_target_files --block -k "$KEY_DIR/releasekey" \
+    build/tools/releasetools/ota_from_target_files -k "$KEY_DIR/releasekey" \
         "${EXTRA_OTA[@]}" $OUT/$TARGET_FILES \
         $OUT/$DEVICE-ota_update-$BUILD.zip || exit 1
     script/generate_metadata.py $OUT/$DEVICE-ota_update-$BUILD.zip
