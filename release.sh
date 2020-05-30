@@ -36,7 +36,7 @@ get_radio_image() {
 
 PREFIX=lineage_
 
-if [[ $1 == taimen || $1 == walleye || $1 == crosshatch || $1 == blueline || $1 == bonito || $1 == sargo || $1 == coral ]]; then
+if [[ $1 == taimen || $1 == walleye || $1 == crosshatch || $1 == blueline || $1 == bonito || $1 == sargo || $1 == coral || $1 == flame ]]; then
     BOOTLOADER=$(get_radio_image bootloader google_devices/$1)
     RADIO=$(get_radio_image baseband google_devices/$1)
 fi
@@ -51,11 +51,11 @@ mkdir -p $OUT || exit 1
 TARGET_FILES=$DEVICE-target_files-$BUILD.zip
 
 if [[ $DEVICE != hikey* ]]; then
-    if [[ $DEVICE == blueline || $DEVICE == crosshatch || $1 == bonito || $1 == sargo || $1 == coral ]]; then
+    if [[ $DEVICE == blueline || $DEVICE == crosshatch || $1 == bonito || $1 == sargo || $1 == coral || $1 == flame ]]; then
         VERITY_SWITCHES=(--avb_vbmeta_key "$KEY_DIR/avb.pem" --avb_vbmeta_algorithm SHA256_RSA2048
                          --avb_system_key "$KEY_DIR/avb.pem" --avb_system_algorithm SHA256_RSA2048)
         AVB_PKMD="$KEY_DIR/avb_pkmd.bin"
-        if [[ $DEVICE != coral ]]; then
+        if [[ $DEVICE != coral && $DEVICE != flame ]]; then
             EXTRA_OTA=(--retrofit_dynamic_partitions)
         fi
     else
