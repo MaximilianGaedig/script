@@ -8,6 +8,12 @@ chrt -b -p 0 $$
 
 [[ $# -eq 1 ]] || user_error "expected a single argument (device type)"
 [[ -n $BUILD_NUMBER ]] || user_error "expected BUILD_NUMBER in the environment"
+[[ -n $RETROFIT ]] || user_error "export RETROFIT=true or RETROFIT=false to specify retrofitting"
+
+if [[ $RETROFIT == "true" ]]; then
+    printf "Using retrofitting\n"
+    EXTRA_OTA=(--retrofit_dynamic_partitions)
+fi
 
 PERSISTENT_KEY_DIR=keys/$1
 OUT=out/release-$1-$BUILD_NUMBER
@@ -28,12 +34,11 @@ get_radio_image() {
     grep -Po "require version-$1=\K.+" vendor/$2/vendor-board-info.txt | tr '[:upper:]' '[:lower:]'
 }
 
+PREFIX=lineage_
+
 if [[ $1 == taimen || $1 == walleye || $1 == crosshatch || $1 == blueline || $1 == bonito || $1 == sargo || $1 == coral || $1 == flame ]]; then
     BOOTLOADER=$(get_radio_image bootloader google_devices/$1)
     RADIO=$(get_radio_image baseband google_devices/$1)
-    PREFIX=aosp_
-elif [[ $1 != hikey && $1 != hikey960 ]]; then
-    user_error "$1 is not supported by the release script"
 fi
 
 BUILD=$BUILD_NUMBER
@@ -57,8 +62,15 @@ if [[ $DEVICE != hikey* ]]; then
     elif [[ $DEVICE == walleye || $DEVICE == taimen ]]; then
         VERITY_SWITCHES=(--avb_vbmeta_key "$KEY_DIR/avb.pem" --avb_vbmeta_algorithm $AVB_ALGORITHM)
     else
-        VERITY_SWITCHES=(--avb_vbmeta_key "$KEY_DIR/avb.pem" --avb_vbmeta_algorithm $AVB_ALGORITHM
-                         --avb_system_key "$KEY_DIR/avb.pem" --avb_system_algorithm $AVB_ALGORITHM)
+        VERITY_SWITCHES=(--avb_vbmeta_key "$KEY_DIR/avb8192.pem" --avb_vbmeta_algorithm SHA512_RSA8192
+		--avb_system_key "$KEY_DIR/avb8192.pem" --avb_system_algorithm SHA512_RSA8192
+		--avb_vendor_key "$KEY_DIR/avb8192.pem" --avb_vendor_algorithm SHA512_RSA8192
+		--avb_boot_key "$KEY_DIR/avb8192.pem" --avb_boot_algorithm SHA512_RSA8192
+		--avb_dtbo_key "$KEY_DIR/avb8192.pem" --avb_dtbo_algorithm SHA512_RSA8192
+		--avb_system_other_key "$KEY_DIR/avb8192.pem" --avb_system_other_algorithm SHA512_RSA8192
+		--avb_vbmeta_system_key "$KEY_DIR/avb8192.pem" --avb_vbmeta_system_algorithm SHA512_RSA8192
+		--avb_vbmeta_vendor_key "$KEY_DIR/avb8192.pem" --avb_vbmeta_vendor_algorithm SHA512_RSA8192)
+        AVB_PKMD="$KEY_DIR/avb_pkmd.bin"
     fi
 fi
 
