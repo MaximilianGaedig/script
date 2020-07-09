@@ -62,7 +62,7 @@ if [[ $DEVICE != hikey* ]]; then
     elif [[ $DEVICE == walleye || $DEVICE == taimen ]]; then
         VERITY_SWITCHES=(--avb_vbmeta_key "$KEY_DIR/avb.pem" --avb_vbmeta_algorithm $AVB_ALGORITHM)
     else
-        VERITY_SWITCHES=(--avb_vbmeta_key "$KEY_DIR/avb8192.pem" --avb_vbmeta_algorithm SHA512_RSA8192
+        VERITY_SWITCHES=(--avb_vbmeta_key "$KEY_DIR/avb.pem" --avb_vbmeta_algorithm SHA256_RSA4096
 		--avb_system_key "$KEY_DIR/avb8192.pem" --avb_system_algorithm SHA512_RSA8192
 		--avb_vendor_key "$KEY_DIR/avb8192.pem" --avb_vendor_algorithm SHA512_RSA8192
 		--avb_boot_key "$KEY_DIR/avb8192.pem" --avb_boot_algorithm SHA512_RSA8192
