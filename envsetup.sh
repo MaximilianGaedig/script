@@ -12,7 +12,7 @@ export DISPLAY_BUILD_NUMBER=true
 export BUILD_USERNAME=glassrom
 export BUILD_HOSTNAME=glassrom
 export OVERRIDE_TARGET_FLATTEN_APEX=true
-export CCACHE_DISABLE=true
-export USE_CCACHE=0
+# export CCACHE_DISABLE=true
+# export USE_CCACHE=0
 
 export TOP=$(pwd)
